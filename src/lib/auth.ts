@@ -66,12 +66,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
       return session
     },
-    async jwt({ token, user, account }) {
+    async jwt({ token, user }) {
       if (user) {
         token.sub = user.id
-      }
-      if (account) {
-        token.accessToken = account.access_token
       }
       return token
     },
@@ -89,4 +86,16 @@ export async function requireAuth() {
     throw new Error("Unauthorized")
   }
   return session.user
+}
+
+export async function getAvailableProviders() {
+  return {
+    email: true,
+    google: !!(
+      process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+    ),
+    github: !!(
+      process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET
+    ),
+  }
 }
