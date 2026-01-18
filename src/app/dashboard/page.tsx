@@ -1,46 +1,44 @@
-import { requireAuth, signOut } from "@/lib/auth"
+import { requireAuth } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Plus } from "lucide-react"
+import Link from "next/link"
+import { StatsCards } from "@/components/dashboard/stats-cards"
+import { RevenueChart } from "@/components/dashboard/revenue-chart"
+import { RecentInvoicesTable } from "@/components/dashboard/recent-invoices-table"
 
 export default async function DashboardPage() {
   const user = await requireAuth()
 
+  const greeting = user.name || user.email?.split("@")[0] || "there"
+
   return (
-    <div className="container mx-auto py-10">
-      <Card className="max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle>Welcome to Dashboard</CardTitle>
-          <CardDescription>You are successfully authenticated</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <p className="text-sm text-muted-foreground">Email:</p>
-            <p className="font-medium">{user.email}</p>
-          </div>
-          {user.name && (
-            <div>
-              <p className="text-sm text-muted-foreground">Name:</p>
-              <p className="font-medium">{user.name}</p>
-            </div>
-          )}
-          <form
-            action={async () => {
-              "use server"
-              await signOut({ redirectTo: "/" })
-            }}
-          >
-            <Button type="submit" variant="outline">
-              Sign Out
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+    <div className="space-y-6">
+      {/* Welcome Header */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Welcome back, {greeting}!
+          </h1>
+          <p className="text-muted-foreground">
+            Here&apos;s what&apos;s happening with your business today.
+          </p>
+        </div>
+        <Button asChild>
+          <Link href="/dashboard/invoices/new" className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Create Invoice
+          </Link>
+        </Button>
+      </div>
+
+      {/* KPI Cards */}
+      <StatsCards />
+
+      {/* Revenue Chart */}
+      <RevenueChart />
+
+      {/* Recent Invoices */}
+      <RecentInvoicesTable />
     </div>
   )
 }
