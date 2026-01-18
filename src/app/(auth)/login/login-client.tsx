@@ -25,15 +25,22 @@ export default function LoginPageClient({ providers }: LoginPageClientProps) {
   const [email, setEmail] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [isEmailSent, setIsEmailSent] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+    setError(null)
     try {
-      await signIn("email", { email, redirect: false })
-      setIsEmailSent(true)
+      const result = await signIn("email", { email, redirect: false })
+      if (result?.error) {
+        setError("Failed to send email. Please try again.")
+      } else {
+        setIsEmailSent(true)
+      }
     } catch (error) {
       console.error("Error signing in:", error)
+      setError("An unexpected error occurred. Please try again.")
     } finally {
       setIsLoading(false)
     }
@@ -41,10 +48,12 @@ export default function LoginPageClient({ providers }: LoginPageClientProps) {
 
   const handleOAuthSignIn = async (provider: string) => {
     setIsLoading(true)
+    setError(null)
     try {
       await signIn(provider, { callbackUrl: "/dashboard" })
     } catch (error) {
       console.error(`Error signing in with ${provider}:`, error)
+      setError(`Failed to sign in with ${provider}. Please try again.`)
       setIsLoading(false)
     }
   }
@@ -81,6 +90,11 @@ export default function LoginPageClient({ providers }: LoginPageClientProps) {
           <CardDescription>Sign in to your account to continue</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {error && (
+            <div className="rounded-md bg-error/10 p-3 text-sm text-error">
+              {error}
+            </div>
+          )}
           <form onSubmit={handleEmailSignIn} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>

@@ -91,10 +91,10 @@ export async function requireAuth() {
 export async function getAvailableProviders() {
   return {
     email: true,
-    google: !!(
+    google: Boolean(
       process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
     ),
-    github: !!(
+    github: Boolean(
       process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET
     ),
   }
