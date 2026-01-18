@@ -78,12 +78,20 @@ invoicely/
 │   │   ├── (auth)/       # Authentication pages
 │   │   ├── (marketing)/  # Landing pages
 │   │   └── dashboard/    # Dashboard pages
+│   │       ├── customers/    # Customer management pages
+│   │       ├── invoices/     # Invoice management pages
+│   │       └── subscriptions/ # Subscription management pages
 │   ├── components/       # React components
 │   │   ├── ui/           # shadcn/ui components
 │   │   ├── dashboard/    # Dashboard components
+│   │   ├── customers/    # Customer components
+│   │   ├── subscriptions/ # Subscription components
 │   │   ├── invoices/     # Invoice components
 │   │   └── landing/      # Landing page components
 │   └── lib/              # Utility functions
+│       ├── customer-data.ts    # Customer data & helpers
+│       ├── subscription-data.ts # Subscription data & helpers
+│       └── invoice-data.ts     # Invoice data & helpers
 ├── prisma/               # Database schema
 ├── public/               # Static assets
 └── docs/                 # Documentation
