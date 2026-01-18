@@ -1,0 +1,161 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// NextAuth.js Models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String         @id @default(cuid())
+  name          String?
+  email         String         @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  invoices      Invoice[]
+  customers     Customer[]
+  subscriptions Subscription[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// Application Models
+model Customer {
+  id              String         @id @default(cuid())
+  name            String
+  email           String
+  company         String?
+  phone           String?
+  billingAddress  String?
+  shippingAddress String?
+  notes           String?
+  userId          String
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  invoices        Invoice[]
+  subscriptions   Subscription[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([userId])
+  @@index([email])
+}
+
+model Invoice {
+  id             String        @id @default(cuid())
+  invoiceNumber  String        @unique
+  status         InvoiceStatus @default(DRAFT)
+  issueDate      DateTime
+  dueDate        DateTime
+  customerId     String
+  customer       Customer      @relation(fields: [customerId], references: [id])
+  userId         String
+  user           User          @relation(fields: [userId], references: [id])
+  lineItems      LineItem[]
+  subtotal       Float
+  taxRate        Float         @default(0)
+  taxAmount      Float         @default(0)
+  discountAmount Float         @default(0)
+  total          Float
+  notes          String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([userId])
+  @@index([customerId])
+  @@index([status])
+  @@index([dueDate])
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+model LineItem {
+  id          String   @id @default(cuid())
+  description String
+  quantity    Float
+  rate        Float
+  amount      Float
+  invoiceId   String
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([invoiceId])
+}
+
+model Subscription {
+  id              String                @id @default(cuid())
+  customerId      String
+  customer        Customer              @relation(fields: [customerId], references: [id])
+  userId          String
+  user            User                  @relation(fields: [userId], references: [id])
+  planName        String
+  amount          Float
+  frequency       SubscriptionFrequency
+  status          SubscriptionStatus
+  nextBillingDate DateTime
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+
+  @@index([userId])
+  @@index([customerId])
+  @@index([status])
+}
+
+enum SubscriptionFrequency {
+  MONTHLY
+  YEARLY
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAUSED
+  CANCELLED
+}
