@@ -98,6 +98,7 @@ invoicely/
 
 ## Documentation
 
+- [Authentication Setup](docs/AUTHENTICATION.md)
 - [Design System](docs/DESIGN_SYSTEM.md)
 - [Product Vision](docs/PRODUCT_VISION.md)
 - [Deployment Guide](docs/DEPLOYMENT.md)
