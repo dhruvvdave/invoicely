@@ -208,11 +208,11 @@ export function InvoiceForm({
                 min="0"
                 max="100"
                 step="0.01"
-                {...register("taxRate", {
-                  valueAsNumber: true,
-                  onChange: (e) => setValue("taxRate", parseFloat(e.target.value) / 100),
-                })}
-                value={watch("taxRate") * 100}
+                defaultValue={watch("taxRate") * 100}
+                onChange={(e) => {
+                  const percentValue = parseFloat(e.target.value) || 0
+                  setValue("taxRate", percentValue / 100)
+                }}
               />
             </div>
 

@@ -22,7 +22,7 @@ export function LineItemEditor({ items, onChange }: LineItemEditorProps) {
 
   const addLineItem = () => {
     const newItem: LineItem = {
-      id: Math.random().toString(36).substr(2, 9),
+      id: crypto.randomUUID(),
       description: "",
       quantity: 1,
       rate: 0,

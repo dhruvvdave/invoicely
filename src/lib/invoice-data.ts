@@ -101,7 +101,7 @@ export const mockCustomers: Customer[] = [
     address: "321 Design Blvd",
     city: "Austin",
     state: "TX",
-    zip: "73301",
+    zip: "78701",
     country: "USA",
   },
   {

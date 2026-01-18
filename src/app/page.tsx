@@ -238,10 +238,7 @@ export default function Home() {
             </div>
             <div className="relative aspect-square lg:aspect-auto lg:h-[500px]">
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-                <div className="text-center">
-                  <FileText className="h-32 w-32 text-primary/40 mx-auto mb-4" />
-                  <p className="text-muted-foreground">Hero illustration placeholder</p>
-                </div>
+                <FileText className="h-32 w-32 text-primary/40" aria-label="Invoice management illustration" />
               </div>
             </div>
           </div>
