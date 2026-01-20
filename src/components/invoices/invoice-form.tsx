@@ -26,6 +26,13 @@ const invoiceFormSchema = z.object({
   issueDate: z.string().min(1, "Issue date is required"),
   dueDate: z.string().min(1, "Due date is required"),
   poNumber: z.string().optional(),
+  lineItems: z.array(z.object({
+    id: z.string(),
+    description: z.string(),
+    quantity: z.number(),
+    rate: z.number(),
+    amount: z.number(),
+  })),
   taxRate: z.number().min(0).max(1),
   discountAmount: z.number().min(0),
   notes: z.string().optional(),

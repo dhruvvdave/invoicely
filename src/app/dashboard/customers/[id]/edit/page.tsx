@@ -1,29 +1,31 @@
 "use client"
 
 import { notFound, useRouter } from "next/navigation"
+import { use } from "react"
 import { CustomerForm, CustomerFormData } from "@/components/customers/customer-form"
 import { getCustomerById } from "@/lib/customer-data"
 
 export default function EditCustomerPage({
   params,
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
   const router = useRouter()
-  const customer = getCustomerById(params.id)
+  const { id } = use(params)
+  const customer = getCustomerById(id)
 
   if (!customer) {
     notFound()
   }
 
   const handleSubmit = (data: CustomerFormData) => {
-    console.log("Updating customer:", params.id, data)
+    console.log("Updating customer:", id, data)
     // TODO: Implement customer update logic
-    router.push(`/dashboard/customers/${params.id}`)
+    router.push(`/dashboard/customers/${id}`)
   }
 
   const handleCancel = () => {
-    router.push(`/dashboard/customers/${params.id}`)
+    router.push(`/dashboard/customers/${id}`)
   }
 
   return (
