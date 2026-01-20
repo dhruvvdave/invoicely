@@ -2,6 +2,7 @@
 
 import { notFound, useRouter } from "next/navigation"
 import Link from "next/link"
+import { use } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -21,17 +22,18 @@ import { Edit, Trash2, Mail, Phone, Building2 } from "lucide-react"
 export default function CustomerDetailPage({
   params,
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
   const router = useRouter()
-  const customer = getCustomerWithStats(params.id, mockInvoices)
+  const { id } = use(params)
+  const customer = getCustomerWithStats(id, mockInvoices)
 
   if (!customer) {
     notFound()
   }
 
   const customerInvoices = mockInvoices
-    .filter((invoice) => invoice.customerId === params.id)
+    .filter((invoice) => invoice.customerId === id)
     .sort((a, b) => new Date(b.issueDate).getTime() - new Date(a.issueDate).getTime())
     .slice(0, 10)
 
