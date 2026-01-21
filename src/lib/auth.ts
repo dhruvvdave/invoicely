@@ -2,7 +2,6 @@ import NextAuth, { DefaultSession } from "next-auth"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import GoogleProvider from "next-auth/providers/google"
 import GitHubProvider from "next-auth/providers/github"
-import EmailProvider from "next-auth/providers/email"
 import prisma from "@/lib/db"
 
 declare module "next-auth" {
@@ -13,34 +12,43 @@ declare module "next-auth" {
   }
 }
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(prisma),
-  providers: [
-    ...(process.env.EMAIL_SERVER
-      ? [
-          EmailProvider({
+const adapter = prisma ? PrismaAdapter(prisma) : undefined
+const isEdgeRuntime = process.env.NEXT_RUNTIME === "edge"
+
+const providers = [
+  ...(!isEdgeRuntime && process.env.EMAIL_SERVER
+    ? [
+        (() => {
+          const EmailProvider =
+            require("next-auth/providers/email").default as typeof import("next-auth/providers/email").default
+          return EmailProvider({
             server: process.env.EMAIL_SERVER,
             from: process.env.EMAIL_FROM || "noreply@invoicely.com",
-          }),
-        ]
-      : []),
-    ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
-      ? [
-          GoogleProvider({
-            clientId: process.env.GOOGLE_CLIENT_ID,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-          }),
-        ]
-      : []),
-    ...(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET
-      ? [
-          GitHubProvider({
-            clientId: process.env.GITHUB_CLIENT_ID,
-            clientSecret: process.env.GITHUB_CLIENT_SECRET,
-          }),
-        ]
-      : []),
-  ],
+          })
+        })(),
+      ]
+    : []),
+  ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+    ? [
+        GoogleProvider({
+          clientId: process.env.GOOGLE_CLIENT_ID,
+          clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        }),
+      ]
+    : []),
+  ...(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET
+    ? [
+        GitHubProvider({
+          clientId: process.env.GITHUB_CLIENT_ID,
+          clientSecret: process.env.GITHUB_CLIENT_SECRET,
+        }),
+      ]
+    : []),
+]
+
+export const { handlers, auth, signIn, signOut } = NextAuth({
+  adapter,
+  providers,
   session: {
     strategy: "jwt",
   },
